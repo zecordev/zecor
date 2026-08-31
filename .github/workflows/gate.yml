@@ -1,0 +1,17 @@
+name: gate
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: sudo apt-get update && sudo apt-get install -y ripgrep
+      - run: uv sync --group dev
+      - run: uv tool install ast-grep-cli && echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - run: bash .zecor/verify.sh

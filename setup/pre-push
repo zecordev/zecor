@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Pre-push hook. Copy into each lane's .git/hooks/pre-push and chmod +x.
+# Refuses any push to a protected branch. Never auto-merge, never force-push.
+while read -r _ _ remote_ref _; do
+  case "$remote_ref" in
+    refs/heads/main|refs/heads/master)
+      echo "zecor: refusing to push to a protected branch" >&2; exit 1;;
+  esac
+done
+exit 0

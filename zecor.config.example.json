@@ -1,0 +1,59 @@
+{
+  "$schema": "https://zecor.dev/schema/config-v1.json",
+
+  "//": "Copy to zecor.config.json (gitignored) or .zecor/config.json. Every field is",
+  "//1": "optional; the values below are the defaults. Environment variables override",
+  "//2": "the file: ZECOR_MODE, ZECOR_LM_BASE_URL, ZECOR_ROOT, etc.",
+
+  "mode": "hardened",
+  "//mode": "hardened | guarded | greenfield -- see SECURITY.md",
+
+  "local_model": {
+    "base_url": "http://127.0.0.1:1234/v1",
+    "//base_url": "OpenAI-compatible endpoint: LM Studio, Ollama (/v1), vLLM, llama.cpp",
+    "primary_coder": "qwen/qwen3-coder-30b",
+    "deep_coder": "qwen/qwen2.5-coder-32b",
+    "reasoner": "openai/gpt-oss-20b",
+    "router": "qwen3-4b-instruct-2507",
+    "embed": "text-embedding-nomic-embed-text-v1.5",
+    "prompt_token_cap": 8000
+  },
+
+  "cloud_fallback": {
+    "//": "Credentials come from the environment, never this file.",
+    "claude_cli": "claude",
+    "codex_cli": "codex",
+    "//keys": "Set ANTHROPIC_API_KEY / OPENAI_API_KEY in the shell that starts zecor;",
+    "//keys2": "run_capped strips them from every lane subprocess."
+  },
+
+  "deterministic_tools": {
+    "//": "Absolute paths only if the binary is not on PATH.",
+    "ast_grep": "ast-grep",
+    "ripgrep": "rg",
+    "git": "git"
+  },
+
+  "gate": {
+    "script": ".zecor/verify.sh",
+    "//script": "The per-repo deterministic gate. .fleet/verify.sh is still accepted.",
+    "ci_script": ".zecor/ci.sh",
+    "wall_clock_cap_s": 900
+  },
+
+  "autonomy": {
+    "max_concurrent_lanes": 2,
+    "local_attempts_before_escalation": 2,
+    "escalations_per_task": 4,
+    "spend_daily_usd": 0,
+    "spend_weekly_usd": 0,
+    "//spend": "0 disables the USD ceiling; the vendor quota table still throttles."
+  },
+
+  "notify": {
+    "ntfy_topic": "",
+    "ntfy_url": "",
+    "pushover_token": "",
+    "pushover_user": ""
+  }
+}

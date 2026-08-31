@@ -1,0 +1,23 @@
+{
+  "name": "zecor-console-webui",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "The command-center PWA: a Lit client for `zecor serve`.",
+  "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "lit": "^3.3.0"
+  },
+  "devDependencies": {
+    "jsdom": "^24.1.1",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.0",
+    "vitest": "^2.0.5"
+  }
+}

@@ -1,0 +1,58 @@
+[project]
+name = "zecor"
+version = "0.1.0"
+description = "Autonomous software construction engine: local deterministic execution plus hybrid model routing"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "Hilachem Ventures LLC" }]
+keywords = ["ai", "agent", "autonomous", "codegen", "local-llm", "deterministic"]
+dependencies = []                      # stdlib-only runtime: sqlite3, subprocess, json
+
+[project.urls]
+Homepage = "https://zecor.dev"
+Source = "https://github.com/zecordev/zecor"
+
+[project.scripts]
+zecor = "zecor.cli:main"
+
+[dependency-groups]
+dev = ["ruff>=0.14", "mypy>=1.13", "pytest>=8.3", "textual>=0.85"]
+# The runtime is stdlib-only. `console` is operator tooling only -- `zecor console`
+# imports it lazily; nothing under zecor/route|orchestrator|workers does.
+console = ["textual>=0.85"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF", "S"]
+ignore = [
+    "RUF059",  # we unpack the full (rc, out, err, killed) tuple to document the shape
+    "S101",    # asserts -- fine in tests; the two non-test ones are raises now
+    "S310",    # urllib open -- every call site is a local (127.0.0.1) model / API
+    "S404",    # flags `import subprocess` itself
+    "S603",    # subprocess with a list argv IS the safe form; the rule is a false positive
+    "S607",    # partial exec path -- PATH is trusted for a dev tool
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S105", "S106", "S107", "S108", "S311"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["zecor"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["zecor"]

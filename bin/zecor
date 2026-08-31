@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
+# bin/zecor -- the only entry point. Works from any directory; symlink it onto PATH:
+#   ln -s "$(pwd)/bin/zecor" ~/.local/bin/zecor
+set -euo pipefail
+
+# resolve this script through any symlinks so ROOT is the repo, not ~/.local/bin
+src="${BASH_SOURCE[0]}"
+while [ -h "$src" ]; do
+  dir="$(cd -P "$(dirname "$src")" && pwd)"
+  src="$(readlink "$src")"
+  [ "${src#/}" = "$src" ] && src="$dir/$src"
+done
+ROOT="$(cd -P "$(dirname "$src")/.." && pwd)"
+
+# vendor API keys the reader tiers pull from the environment, kept out of the repo
+SECRETS="${ZECOR_SECRETS:-${FLEET_SECRETS:-$HOME/.config/secrets/personal.env}}"
+if [ -f "$SECRETS" ]; then
+  set -a
+  # shellcheck disable=SC1090
+  . "$SECRETS"
+  set +a
+fi
+
+if [ -x "$ROOT/.venv/bin/python" ]; then
+  exec "$ROOT/.venv/bin/python" -m zecor "$@"
+fi
+exec uv run --directory "$ROOT" python -m zecor "$@"

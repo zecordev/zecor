@@ -1,0 +1,60 @@
+name: security
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"
+permissions:
+  contents: read
+jobs:
+  sast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pipx install ruff bandit
+      - run: ruff check .
+      # -s: reviewed, false-positive-shaped for this repo -- B404/B603/B607 fire on
+      # every subprocess call, which is this engine's core mechanism (allow-listed by
+      # zecor.toolgate in hardened mode, the actual control); B310 is the same fixed
+      # vendor/operator-endpoint urlopen calls semgrep excludes above.
+      - run: bandit -q -r zecor -x zecor/console -s B310,B404,B603,B607
+  deps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: osv-scanner
+        uses: google/osv-scanner-action/osv-scanner-action@v2.0.2
+        with:
+          scan-args: |-
+            --recursive
+            ./
+  semgrep:
+    runs-on: ubuntu-latest
+    container: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      # exclude-rule: reviewed, false-positive-shaped for this repo --
+      #  mutable-action-tag: SHA-pinning every action is a separate, deliberately
+      #    deferred decision (same call made on the zecordev crate repos)
+      #  dynamic-urllib-use-detected: every hit is a fixed vendor/operator endpoint
+      #    (LM_BASE_URL, a hardcoded API host), never attacker-controlled input
+      #  curl-pipe-bash: setup/bootstrap.sh's Homebrew install is the vendor's own
+      #    documented command, gated behind $CHECK_ONLY
+      - run: >-
+          semgrep scan --config=auto --error --quiet
+          --exclude-rule yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
+          --exclude-rule python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected
+          --exclude-rule bash.curl.security.curl-pipe-bash.curl-pipe-bash
+  workflows:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker://rhysd/actionlint:latest
+        with: { args: -color }
+      # continue-on-error: SHA/image pinning is a deliberately deferred decision (same
+      # call made on the zecordev crate repos) -- advisory, not a gate.
+      - run: pipx install zizmor && zizmor --persona=regular .github/workflows
+        continue-on-error: true

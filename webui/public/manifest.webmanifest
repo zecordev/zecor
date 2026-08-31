@@ -1,0 +1,14 @@
+{
+  "name": "fleet console",
+  "short_name": "fleet",
+  "description": "Command center for the autonomous build fleet.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f1210",
+  "theme_color": "#0f1210",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

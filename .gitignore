@@ -1,0 +1,23 @@
+db/*.db
+db/*.db-wal
+db/*.db-shm
+.permits/
+.run.lock
+lanes/*/
+!lanes/.gitkeep
+tasks/*.md
+digest/*.md
+logs/*
+!logs/.gitkeep
+.venv/
+__pycache__/
+*.pyc
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Rust helper binaries: downloaded prebuilts in ./bin, or a from-source build's target/
+# (the tools live in their own repos now -- see RUST-TOOLS.md)
+/bin/zecor-*
+target/
+/target

@@ -1,0 +1,6 @@
+# type(scope): imperative subject <= 50 chars
+#
+# Body wrapped at 72 columns. Explain WHY, and the invariant preserved or changed.
+# type: feat | fix | chore | docs | test | refactor | perf | build | ci
+#
+# BREAKING CHANGE: <describe> — only if applicable.

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "context-firewall brief",
+  "description": "Plan section 3. No frontier model ever sees a raw artifact; the local model reads it and emits this. Cap 2000 tokens in the harness; truncate and flag rather than passing a fat one through. Enforce with LM Studio structured-output / JSON-schema-constrained decoding so a malformed brief is impossible.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["summary", "failures", "already_ruled_out", "files_worth_reading", "question_for_escalation"],
+  "properties": {
+    "summary": {
+      "type": "string",
+      "maxLength": 400,
+      "description": "One or two sentences. What is wrong, and the smallest true statement of scope."
+    },
+    "failures": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["test", "file", "expected", "actual", "first_divergence"],
+        "properties": {
+          "test": { "type": "string", "description": "Name of the failing assertion." },
+          "file": { "type": "string", "description": "path:line of the assertion." },
+          "expected": { "type": "string" },
+          "actual": { "type": "string" },
+          "first_divergence": {
+            "type": "string",
+            "description": "path:line -- earliest point the run departs from correct behaviour, plus the mechanism in a clause."
+          }
+        }
+      }
+    },
+    "already_ruled_out": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Hypotheses the local attempts eliminated, so no downstream tier repeats them."
+    },
+    "files_worth_reading": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "path:line-range only. Retrieval output, not a file dump."
+    },
+    "question_for_escalation": {
+      "type": ["string", "null"],
+      "description": "Section 4.4: non-null ONLY when it names a DECISION the model cannot make from the code alone -- not a fact it merely does not know (that is a retrieval miss, route to T0). Null when the local tier can still make progress."
+    }
+  }
+}
